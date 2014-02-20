@@ -1,10 +1,6 @@
-use Test::More;
-
+use Test::More tests => 2;
 use strict;
 use warnings;
-
-# Make sure the module loads
-# BEGIN { use_ok('Kelp::Module::DBIx::Mint') };
 
 # Build a Kelp app
 {

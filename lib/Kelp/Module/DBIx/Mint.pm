@@ -1,5 +1,6 @@
 package Kelp::Module::DBIx::Mint;
 use DBIx::Mint;
+use Carp;
 use parent 'Kelp::Module';
 use 5.010000;
 use strict;
@@ -14,8 +15,15 @@ sub build {
 sub build_mint {
     my ($self, $settings) = @_;
 
-    # The code below was modified from Dancer::Plugin::Database::Core,
-    # by David Precious:
+    if (not exists $settings->{dsn} && not exists $settings->{driver}) {
+        croak 'You must specify either the dsn or the driver for Kelp::Module::DBIx::Mint';
+    }
+
+    if (not exists $settings->{username} || not exists $settings->{password}) {
+        croak 'You must specify both username and password for  Kelp::Module::DBIx::Mint';
+    }
+
+    # The code below was modified from Dancer::Plugin::Database::Core
     
     # Assemble the DSN:
     my $dsn    = '';
@@ -30,12 +38,7 @@ sub build_mint {
  
         # DBD::SQLite wants 'dbname', not 'database', so special-case this
         # (DBI's documentation recommends that DBD::* modules should understand
-        # 'database', but older versions of DBD::SQLite didn't; let's make
-        # things easier for our users by handling this for them):
-        # (I asked in RT #61117 for DBD::SQLite to support 'database', too; this
-        # was included in DBD::SQLite 1.33, released Mon 20 May 2011.
-        # Special-casing may as well stay, rather than forcing dependency on
-        # DBD::SQLite 1.33. (David Precious)
+        # 'database', but older versions of DBD::SQLite didn't
         if ($driver eq 'SQLite'
             && $settings->{database} && !$settings->{dbname}) {
             $settings->{dbname} = delete $settings->{database};
@@ -67,7 +70,6 @@ sub build_mint {
         }
     }
 
-    # Back to being my own code:
     $settings->{dbi_params}{RaiseError} = 1 if (!exists $settings->{ RaiseError });
     $settings->{dbi_params}{AutoCommit} = 1 if (!exists $settings->{ AutoCommit });
  
@@ -142,7 +144,7 @@ After including 'DBIx::Mint' in the list of modules, the C<module_init> section 
 
 =item dsn
 
-You can set directly the dsn for your database (see the synopsis). You can also set the different parts of the dsn by themselves:
+You can set directly the dsn for your database (see the synopsis). If you don't, then you must set the different parts of the dsn by themselves:
 
 =over
 
@@ -178,8 +180,8 @@ L<Kelp>, L<DBIx::Mint>. For a different ORM, L<Rose::DB::Object>, see <Kelp::Mod
 
 Thanks to Stefan G. (MINIMAL) for the creation of L<Kelp>.
 
-The guts of this module were taken from L<Dancer::Plugin::Database::Core>,
-by David Precious, in particular for the handling of utf-8 by PostgreSQL, MySQL and SQLite. 
+A large portion of this module was forked from L<Dancer::Plugin::Database::Core>,
+by David Precious. 
 
 =head1 AUTHOR
 
