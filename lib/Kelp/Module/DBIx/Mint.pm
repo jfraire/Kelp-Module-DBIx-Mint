@@ -6,6 +6,8 @@ use 5.010000;
 use strict;
 use warnings;
 
+our $VERSION = 0.01;
+
 sub build {
     my ($self, %args) = @_;
     my $mint = $self->build_mint( \%args );
@@ -85,7 +87,7 @@ sub build_mint {
 
 =head1 NAME
 
-Kelp::Module::DBIx::Mint - Add Mint to your Kelp web application
+Kelp::Module::DBIx::Mint - Add an ORM to your Kelp web application
 
 =head1 SYNOPSIS
 
